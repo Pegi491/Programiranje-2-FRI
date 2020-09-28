@@ -1,0 +1,209 @@
+public class Naloga11 {
+
+  public static void main(String[] args) {
+    if (args.length != 1) {
+      System.out.println("Napačno število argumentov");
+      System.exit(0);
+    }
+
+    HashMap<String, Integer> besede = new HashMap<>();
+
+    try (Scanner sc = new Scanner(new File(args[0]));) {
+      while (sc.hasNext()) {
+        String beseda = sc.next();
+        beseda = beseda.replaceAll("[.,;:()]", "").toUpperCase();
+        besede.put(beseda, besede.getOrDefault(beseda, 0)+1);
+      }
+    } catch (Exception e) {
+      System.out.println("Napaka: " + e.toString());
+    }
+
+    if (besede.isEmpty()) {
+      System.out.println("Datoteka ne vsebuje besed");
+      System.exit(0);
+    }
+
+    ArrayList<String> seznamBesed = new ArrayList(besede.keySet());
+    seznamBesed.sort(new Comparator<String>() {
+      @Override
+      public int compare(String o1, String o2) {
+        return besede.get(o2) - besede.get(o1);
+      }
+    });
+
+    System.out.println(seznamBesed.get(0));
+  }
+}
+########################################################################################
+public class Naloga12 {
+
+  public static void main(String[] args) {
+    JTextField datumTF = new JTextField(10);
+    JButton gumbDatum = new JButton("Datum");
+    JButton gumbBarva = new JButton("Barva");
+    JTextField koorTF = new JTextField(10);
+    JPanel sredina = new JPanel();
+
+    gumbDatum.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd. MM. yyyy");
+        datumTF.setText(sdf.format(new Date()));
+      }
+    });
+
+    sredina.addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        koorTF.setText(String.format("(%d, %d)", e.getX(), e.getY()));
+      }
+    });
+
+    gumbBarva.addActionListener((e)->{
+      Random rnd = new Random();
+      sredina.setBackground(new Color(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256)));
+    });
+
+    JPanel zgoraj = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    zgoraj.add(gumbDatum);
+    zgoraj.add(datumTF);
+    zgoraj.add(gumbBarva);
+
+    JPanel spodaj = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    spodaj.add(koorTF);
+
+    JFrame okno = new JFrame("Okno z datumom in miško");
+
+    okno.add(zgoraj, BorderLayout.PAGE_START);
+    okno.add(sredina);
+    okno.add(spodaj, BorderLayout.PAGE_END);
+    okno.setSize(500,500);
+    okno.setVisible(true);
+  }
+}
+#################################################################################
+public class Naloga13 {
+
+  static String popraviBesedilo(String besedilo) {
+    if (besedilo.length() <= 1) return besedilo;
+    char prejšnja = besedilo.charAt(0);
+
+    StringBuffer brezPodvojenih = new StringBuffer(""+besedilo.charAt(0));
+    for (int i = 1; i < besedilo.length(); i++) {
+      if (brezPodvojenih.charAt(brezPodvojenih.length()-1) != besedilo.charAt(i))
+        brezPodvojenih.append(besedilo.charAt(i));
+    }
+
+    String [] besede = brezPodvojenih.toString().split(" ");
+    String lastWord = besede[0];
+    StringBuffer result = new StringBuffer(lastWord);
+    for (int i = 1; i < besede.length; i++) {
+      if (!lastWord.toUpperCase().equals(besede[i].toUpperCase())) {
+        result.append((result.length() == 0 ? "" : " ") + besede[i]);
+        lastWord = besede[i];
+      }
+    }
+
+    return result.toString();
+  }
+
+  public static void main(String[] args) {
+    //args = new String[] {"Paa", "pa", "ppa", "nneee", "ne", "ne", "žžže", "že", "žee", "spppet!"};
+    // args = new String[] {"Proggrammiranje", "mi", "mmii", "mii", "je", "jjje", "všeččč", "všeč"};
+    // args = new String[] {"Dannes", "je",  "jee", "jje", "lepp", "dan"};
+
+    String besedilo = "";
+    for (int i = 0; i < args.length ; i++) {
+      besedilo += (besedilo.isEmpty() ? "" : " ") + args[i];
+    }
+
+    System.out.println(popraviBesedilo(besedilo));
+  }
+}
+#########################################################################################
+
+
+class Lokacija {
+  private char vrstica;
+  private int  stolpec;
+
+  public Lokacija(char vrstica, int stolpec) {
+    this.vrstica = vrstica;
+    this.stolpec = stolpec;
+  }
+
+  public char getVrstica() {
+    return vrstica;
+  }
+
+  public void setVrstica(char vrstica) {
+    this.vrstica = vrstica;
+  }
+
+  public int getStolpec() {
+    return stolpec;
+  }
+
+  public void setStolpec(int stolpec) {
+    this.stolpec = stolpec;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("(%c,%d)", vrstica, stolpec);
+  }
+}
+
+/**
+ * @author tomaz
+ **/
+public class Naloga14 {
+
+  static char [][] krizanka = {
+          {'D', 'F', 'T', 'O', 'P'},
+          {'L', 'I', 'P', 'A', 'M'},
+          {'C', 'K', 'O', 'L', 'T'},
+          {'F', 'E', 'S', 'G', 'T'},
+          {'S', 'S', 'M', 'E', 'T'}
+  };
+
+  static String [] besede = {"LOPAR", "SONCE", "KOL", "KOLO", "TOP", "LIPA", "SMET", "ORODJE"};
+
+  static boolean seZacne(char [][] krizanka, String beseda, Lokacija lok) {
+    int v = lok.getVrstica()-'a';
+    int s = lok.getStolpec()- 1 ;
+
+    // če je beseda predolga, da bi se začela v stolpcu s, vrnem false
+    if (krizanka[v].length - s < beseda.length()) return false;
+
+    for (int i=0; i<beseda.length(); i++) {
+      if (krizanka[v][s+i] != beseda.charAt(i)) return false;
+    }
+    return true;
+  }
+
+  static Lokacija poisciNajdaljso(char [][] krizanka, String [] besede) {
+    String najdaljsa = "";
+    Lokacija najL = null;
+    for(int v=0; v<krizanka.length; v++) {
+      for (int s = 1; s <= krizanka[v].length ; s++) {
+        Lokacija trL = new Lokacija((char)('a' + v), s);
+        for (int k = 0; k < besede.length; k++) {
+          if (besede[k].length() > najdaljsa.length() && seZacne(krizanka, besede[k], trL)) {
+             najdaljsa = besede[k];
+             najL = trL;
+          }
+
+        }
+      }
+    }
+    return najL;
+  }
+
+  public static void main(String[] args) {
+    System.out.printf("Prva najdaljša beseda se nahaja na lokaciji %s\n",
+       poisciNajdaljso(krizanka, besede));
+  }
+}
+
+#########################################################################################

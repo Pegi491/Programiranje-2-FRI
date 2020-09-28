@@ -1,0 +1,79 @@
+package Kol2;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Scanner;
+
+public class Naloga24 {
+
+    static class Povezava{
+        private String zac;
+        private String kon;
+        private int cena;
+
+        public String getZac() {
+            return zac;
+        }
+
+        public void setZac(String zac) {
+            this.zac = zac;
+        }
+
+        public String getKon() {
+            return kon;
+        }
+
+        public void setKon(String kon) {
+            this.kon = kon;
+        }
+
+        public int getCena() {
+            return cena;
+        }
+
+        public void setCena(int cena) {
+            this.cena = cena;
+        }
+
+        public Povezava(String zac, String kon, int cena){
+            this.zac = zac;
+            this.kon = kon;
+            this.cena = cena;
+        }
+
+
+    }
+
+    static ArrayList<Povezava> preberiPovezave (String imeDatoteke) throws FileNotFoundException {
+        ArrayList<Povezava> povezave = new ArrayList<>();
+        Scanner sc = new Scanner(new File(imeDatoteke));
+        while (sc.hasNext()){
+            String vrsta = sc.nextLine();
+            //System.out.println(vrsta);
+            String[] pos = vrsta.split(" ");
+            povezave.add(new Povezava(pos[0], pos[1], Integer.parseInt(pos[2])));
+        }
+        return povezave;
+    }
+    static ArrayList<String> poisciPot (ArrayList<Povezava> povezave, String zacetek, int kako){
+        ArrayList<String> pot = new ArrayList<>();
+        ArrayList<String> vse_poti = new ArrayList<>();
+        for (Povezava x: povezave){
+            if (x.getZac().equals(zacetek)){
+                System.out.println(zacetek + " -> " + x.getKon());
+            }
+        }
+        return pot;
+    }
+    public static void main(String[] args) throws FileNotFoundException {
+        poisciPot(preberiPovezave("graf.txt"),"0", 0);
+        poisciPot(preberiPovezave("graf.txt"),"1", 0);
+        poisciPot(preberiPovezave("graf.txt"),"2", 0);
+        poisciPot(preberiPovezave("graf.txt"),"3", 0);
+        poisciPot(preberiPovezave("graf.txt"),"4", 0);
+
+
+    }
+}
